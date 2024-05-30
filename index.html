@@ -2,24 +2,65 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Karimi4_coin</title>
+    <style>
+      .animate {
+        position: relative;
+        animation: pop 0.5s ease-out;
+      }
+      @keyframes pop {
+        0% {
+          top: 0;
+          opacity: 1;
+        }
+        100% {
+          top: -20px;
+          opacity: 0;
+        }
+      }
+      body {
+        background-color: black;
+        color: white;
+        font-family: sans-serif;
+        text-align: center;
+      }
+    </style>
   </head>
 
   <body>
     <h1>Нажми на karimi4</h1>
-    <img src="image.jpg" width="250" id="img" onclick="incrementCount()" />
+    <img src="image.png" width="250" id="img" onclick="incrementCount()" />
     <h3><p id="count">У вас 0 нажатий на рому</p></h3>
 
     <script>
       function incrementCount() {
-        let count = parseInt(
-          document.getElementById("count").textContent.split(" ")[2]
-        );
+        // Получаем счетчик
+        let count = parseInt(localStorage.getItem("click_Count")) || 0;
         count++;
+        if (count >= 1000) document.getElementById("img").src = "new-image.png";
         document.getElementById("count").textContent =
           "У вас " + count + " нажатий на рому";
+        // Создаем
+        let animationElement = document.createElement("div");
+        animationElement.textContent = "+1";
+        animationElement.classList.add("animate");
+        document.body.appendChild(animationElement);
+
+        // Удаляем
+        setTimeout(() => {
+          document.body.removeChild(animationElement);
+        }, 500);
+        // Сохраняем счетчик
+        localStorage.setItem("click_Count", count);
       }
+
+      // Устанавливаем текст при заггрузке
+      document.addEventListener("DOMContentLoaded", (event) => {
+        let count = parseInt(localStorage.getItem("click_Count")) || 0;
+        document.getElementById("count").textContent =
+          "У вас " + count + " нажатий на рому";
+      });
     </script>
   </body>
 </html>
