@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" />
+    <title>Karimi4_coin</title>
+  </head>
+
+  <body>
+    <h1>Нажми на karimi4</h1>
+    <img src="image.jpg" width="250" id="img" onclick="incrementCount()" />
+    <h3><p id="count">У вас 0 нажатий на рому</p></h3>
+
+    <script>
+      function incrementCount() {
+        let count = parseInt(
+          document.getElementById("count").textContent.split(" ")[2]
+        );
+        count++;
+        document.getElementById("count").textContent =
+          "У вас " + count + " нажатий на рому";
+      }
+    </script>
+  </body>
+</html>
