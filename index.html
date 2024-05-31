@@ -1,66 +1,140 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Karimi4_coin</title>
-    <style>
-      .animate {
-        position: relative;
-        animation: pop 0.5s ease-out;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Karimi4_coin</title>
+  <style>
+    .animate {
+      position: relative;
+      animation: pop 0.5s ease-out;
+    }
+    @keyframes pop {
+      0% {
+        top: 0;
+        opacity: 1;
       }
-      @keyframes pop {
-        0% {
-          top: 0;
-          opacity: 1;
-        }
-        100% {
-          top: -20px;
-          opacity: 0;
-        }
+      100% {
+        top: -20px;
+        opacity: 0;
       }
-      body {
-        background-color: black;
-        color: white;
-        font-family: sans-serif;
-        text-align: center;
+    }
+    body {
+      background-color: black;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    #upgrade, #generator {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    #upgradesOwned {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Нажми на karimi4</h1>
+  <img src="image.png" width="250" id="img" onclick="incrementCount()" />
+  <h3><p id="count">У вас 0 нажатий</p></h3>
+  <button id="upgrade" onclick="purchaseUpgrade()">Улучшить за 500 нажатий</button>
+  <button id="generator" onclick="purchaseGenerator()">Купить нажиматор за 1000 нажатий</button>
+  <div id="upgradesOwned">
+    <p>Куплено улучшений: <span id="upgradesCount">0</span></p>
+    <p>Куплено нажиматоров: <span id="generatorsCount">0</span></p>
+  </div>
+
+  <script>
+    let clickValue = parseInt(localStorage.getItem("click_Value")) || 1;
+    let clickCount = parseInt(localStorage.getItem("click_Count")) || 0;
+    let upgradeCost = parseInt(localStorage.getItem("upgrade_Cost")) || 250;
+    let generatorCost = parseInt(localStorage.getItem("generator_Cost")) || 250;
+    let generatorsOwned = parseInt(localStorage.getItem("generators_Owned")) || 0;
+    let passiveClicksPerSecond = generatorsOwned * 1; 
+
+    function incrementCount() {
+      clickCount += clickValue;
+      updateDisplay();
+      createAnimation();
+      saveCount();
+    }
+
+    function purchaseUpgrade() {
+      if (clickCount >= upgradeCost) {
+        clickCount -= upgradeCost;
+        clickValue += 1;
+        upgradeCost *= 2;
+        saveCount();
+        updateDisplay();
+        updateUpgradesDisplay(); // upgrade update
+      } else {
+        alert('Недостаточно нажатий для покупки улучшения!');
       }
-    </style>
-  </head>
+    }
 
-  <body>
-    <h1>Нажми на karimi4</h1>
-    <img src="image.png" width="250" id="img" onclick="incrementCount()" />
-    <h3><p id="count">У вас 0 нажатий на рому</p></h3>
-
-    <script>
-      function incrementCount() {
-        // Получаем счетчик
-        let count = parseInt(localStorage.getItem("click_Count")) || 0;
-        count++;
-        if (count >= 1000) document.getElementById("img").src = "new-image.png";
-        document.getElementById("count").textContent =
-          "У вас " + count + " нажатий на рому";
-        // Создаем
-        let animationElement = document.createElement("div");
-        animationElement.textContent = "+1";
-        animationElement.classList.add("animate");
-        document.body.appendChild(animationElement);
-
-        // Удаляем
-        setTimeout(() => {
-          document.body.removeChild(animationElement);
-        }, 500);
-        // Сохраняем счетчик
-        localStorage.setItem("click_Count", count);
+    function purchaseGenerator() {
+      if (clickCount >= generatorCost) {
+        clickCount -= generatorCost;
+        generatorsOwned += 1;
+        generatorCost += 100;
+        passiveClicksPerSecond = generatorsOwned * 1;
+        saveCount();
+        updateDisplay();
+        updateUpgradesDisplay();
+      } else {
+        alert('Недостаточно нажатий для покупки нажиматоров!');
       }
+    }
 
-      // Устанавливаем текст при заггрузке
-      document.addEventListener("DOMContentLoaded", (event) => {
-        let count = parseInt(localStorage.getItem("click_Count")) || 0;
-        document.getElementById("count").textContent =
-          "У вас " + count + " нажатий на рому";
-      });
-    </script>
-  </body>
+    function updateDisplay() {
+      document.getElementById('count').textContent = "У вас " + clickCount + " нажатий";
+      document.getElementById('upgrade').textContent = "Улучшить за " + upgradeCost + " нажатий";
+      document.getElementById('generator').textContent = "Купить нажиматор за " + generatorCost + " нажатий";
+      // img update
+      if (clickCount >= 1000) document.getElementById("img").src = "image2.png";
+      if (clickCount >= 2000) document.getElementById("img").src = "image3.png";
+    }
+
+    function updateUpgradesDisplay() {
+      document.getElementById('upgradesCount').textContent = clickValue - 1;
+      document.getElementById('generatorsCount').textContent = generatorsOwned;
+    }
+
+    function createAnimation() {
+      let animationElement = document.createElement("div");
+      animationElement.textContent = "+" + clickValue;
+      animationElement.classList.add("animate");
+      document.body.appendChild(animationElement);
+      setTimeout(() => {
+        document.body.removeChild(animationElement);
+      }, 500);
+    }
+
+    function addPassiveClicks() {
+      clickCount += passiveClicksPerSecond;
+      saveCount();
+      updateDisplay();
+    }
+
+    setInterval(addPassiveClicks, 500);
+
+    function saveCount() {
+      localStorage.setItem("click_Count", clickCount);
+      localStorage.setItem("click_Value", clickValue);
+      localStorage.setItem("upgrade_Cost", upgradeCost);
+      localStorage.setItem("generator_Cost", generatorCost);
+      localStorage.setItem("generators_Owned", generatorsOwned);
+    }
+
+    document.addEventListener("DOMContentLoaded", (event) => {
+      updateDisplay();
+      updateUpgradesDisplay(); // upgrades update
+    });
+  </script>
+</body>
 </html>
